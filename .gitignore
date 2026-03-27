@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+env.bak/
+venv.bak/
+
+# PyInstaller
+dist/
+build/
+*.spec
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project specific
+data/
+I2P/
+*.db
+*.log
+*.ini
+*.json
+!assets/*.json  # if any default configs
+!core/config.py  # but keep source config? Actually config.py is source code, not config file.
+# We don't want to commit user data like cookies.json, bookmarks.json, etc.
+*.tmp
+*.temp
+
+# Compiled binary (if accidentally added)
+Rise.exe
+Rise.rar

@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rise Browser</title>
+    <script src="qrc:///qtwebchannel/qwebchannel.js"></script>
+    <style>
+        /* --- Ваши стили (оставьте как есть) --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            background: linear-gradient(135deg, #0a0a0a, #1a1a2e);
+        }
+        .bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+        .bg-circle {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
+            animation: bg-move 20s infinite alternate ease-in-out;
+        }
+        .bg-circle:nth-child(1) {
+            width: 60vmax;
+            height: 60vmax;
+            background: radial-gradient(circle, rgba(0, 100, 255, 0.3), transparent 70%);
+            top: -10%;
+            left: -10%;
+            animation-duration: 25s;
+        }
+        .bg-circle:nth-child(2) {
+            width: 70vmax;
+            height: 70vmax;
+            background: radial-gradient(circle, rgba(0, 200, 255, 0.2), transparent 70%);
+            bottom: -15%;
+            right: -10%;
+            animation-duration: 30s;
+            animation-delay: -5s;
+        }
+        .bg-circle:nth-child(3) {
+            width: 50vmax;
+            height: 50vmax;
+            background: radial-gradient(circle, rgba(100, 80, 255, 0.25), transparent 70%);
+            top: 20%;
+            right: 5%;
+            animation-duration: 28s;
+            animation-delay: -2s;
+        }
+        .bg-circle:nth-child(4) {
+            width: 55vmax;
+            height: 55vmax;
+            background: radial-gradient(circle, rgba(0, 150, 200, 0.2), transparent 70%);
+            bottom: 5%;
+            left: 10%;
+            animation-duration: 32s;
+            animation-delay: -8s;
+        }
+        @keyframes bg-move {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(5%, 5%) scale(1.1); }
+        }
+        .star {
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            box-shadow: 0 0 8px rgba(0, 168, 255, 0.3);
+            animation: twinkle 5s infinite ease-in-out;
+            z-index: 1;
+        }
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.2); }
+        }
+        .content {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        .title {
+            font-size: 5rem;
+            font-weight: bold;
+            margin-bottom: 40px;
+            letter-spacing: 10px;
+            background: linear-gradient(135deg, #aaccff, #00a8ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(0, 168, 255, 0.3);
+        }
+        .search-wrapper {
+            position: relative;
+            width: 100%;
+            margin: 20px 0;
+        }
+        .search-box {
+            width: 100%;
+            padding: 18px 30px;
+            font-size: 18px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 60px;
+            color: #fff;
+            outline: none;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        .search-box:hover {
+            transform: scale(1.02);
+            border-color: #00a8ff;
+            background: rgba(0, 168, 255, 0.1);
+            animation: glowPulse 1.5s infinite;
+        }
+        @keyframes glowPulse {
+            0% { box-shadow: 0 0 30px #00a8ff, 0 0 60px rgba(0, 168, 255, 0.4); }
+            50% { box-shadow: 0 0 60px #00a8ff, 0 0 90px rgba(0, 168, 255, 0.6); }
+            100% { box-shadow: 0 0 30px #00a8ff, 0 0 60px rgba(0, 168, 255, 0.4); }
+        }
+        .search-box:focus {
+            border-color: #00a8ff;
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 40px rgba(0, 168, 255, 0.6);
+            transform: scale(1.02);
+        }
+        .search-engine-indicator {
+            margin-top: 15px;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+        .search-engine-indicator span {
+            color: #00a8ff;
+            font-weight: bold;
+        }
+        .add-btn {
+            width: 60px;
+            height: 60px;
+            background: #00a8ff;
+            border: none;
+            border-radius: 50%;
+            color: #fff;
+            font-size: 35px;
+            cursor: pointer;
+            margin-top: 30px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 168, 255, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .add-btn:hover {
+            transform: scale(1.1) rotate(90deg);
+            background: #0097e6;
+            box-shadow: 0 0 30px #00a8ff;
+        }
+        .bookmarks-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 35px;
+            justify-content: center;
+        }
+        .bookmark-item {
+            padding: 12px 22px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 40px;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            user-select: none;
+            font-size: 14px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        .bookmark-item:hover {
+            background: rgba(0, 168, 255, 0.15);
+            border-color: #00a8ff;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(0, 168, 255, 0.3);
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(12px);
+        }
+        .modal.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .modal-content {
+            background: rgba(20, 20, 30, 0.9);
+            padding: 40px;
+            border-radius: 30px;
+            border: 1px solid rgba(0, 168, 255, 0.3);
+            min-width: 450px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+        }
+        .modal-content h3 {
+            margin-bottom: 25px;
+            color: #00a8ff;
+            font-size: 24px;
+            text-align: center;
+        }
+        .modal-content input {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            color: #fff;
+            font-size: 16px;
+        }
+        .modal-content input:focus {
+            outline: none;
+            border-color: #00a8ff;
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 20px rgba(0, 168, 255, 0.3);
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            margin-top: 10px;
+        }
+        .modal-buttons button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+        .btn-cancel:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        .btn-save {
+            background: #00a8ff;
+            color: #fff;
+        }
+        .btn-save:hover {
+            background: #0097e6;
+            box-shadow: 0 5px 20px rgba(0, 168, 255, 0.5);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <!-- Анимированный фон -->
+    <div class="bg">
+        <div class="bg-circle"></div>
+        <div class="bg-circle"></div>
+        <div class="bg-circle"></div>
+        <div class="bg-circle"></div>
+    </div>
+    <div class="star" style="width:2px; height:2px; top:15%; left:10%;"></div>
+    <div class="star" style="width:3px; height:3px; top:70%; left:80%;"></div>
+    <div class="star" style="width:2px; height:2px; top:30%; left:90%;"></div>
+    <div class="star" style="width:4px; height:4px; top:85%; left:20%;"></div>
+    <div class="star" style="width:2px; height:2px; top:45%; left:5%;"></div>
+
+    <div class="content">
+        <h1 class="title">RISE</h1>
+        <div class="search-wrapper">
+            <input type="text" class="search-box" id="searchInput" placeholder="Введите URL или поиск..." autofocus>
+        </div>
+        <div class="search-engine-indicator" id="searchEngineName">
+            Поиск через: <span id="searchEngineNameSpan">Google</span>
+        </div>
+        <button class="add-btn" id="addBtn">+</button>
+        <div class="bookmarks-container" id="bookmarksContainer"></div>
+    </div>
+
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <h3>➕ Добавить ярлык</h3>
+            <input type="text" id="modalInput1" placeholder="Название ярлыка">
+            <input type="text" id="modalInput2" placeholder="URL (например: https://google.com)">
+            <div class="modal-buttons">
+                <button class="btn-cancel" id="cancelBtn">Отмена</button>
+                <button class="btn-save" id="saveBtn">Сохранить</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SEARCH_ENGINE = "{{SEARCH_ENGINE}}";
+        document.getElementById('searchEngineNameSpan').textContent = SEARCH_ENGINE;
+
+        let bridge = null;
+        let bridgeReady = false;
+
+        // --- Функция для инициализации моста с ожиданием готовности ---
+        function initBridge() {
+            if (typeof qt !== 'undefined' && qt.webChannelTransport) {
+                try {
+                    new QWebChannel(qt.webChannelTransport, function(channel) {
+                        bridge = channel.objects.bridge;
+                        if (bridge) {
+                            console.log('Bridge connected');
+                            bridgeReady = true;
+                            loadBookmarks();
+                        } else {
+                            console.error('Bridge object not found');
+                            setTimeout(initBridge, 500);
+                        }
+                    });
+                } catch (e) {
+                    console.error('Error creating QWebChannel:', e);
+                    setTimeout(initBridge, 500);
+                }
+            } else {
+                console.log('qt not ready, retrying in 500ms');
+                setTimeout(initBridge, 500);
+            }
+        }
+        initBridge();
+
+        const searchInput = document.getElementById('searchInput');
+        const modal = document.getElementById('modal');
+        const addBtn = document.getElementById('addBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const saveBtn = document.getElementById('saveBtn');
+        const input1 = document.getElementById('modalInput1');
+        const input2 = document.getElementById('modalInput2');
+        const container = document.getElementById('bookmarksContainer');
+
+        // --- Обработка поиска (Enter) ---
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                let query = searchInput.value.trim();
+                if (!query) return;
+
+                if (query.includes('.') && !query.startsWith(' ')) {
+                    if (!query.startsWith('http://') && !query.startsWith('https://')) {
+                        query = 'https://' + query;
+                    }
+                    window.location.href = query;
+                } else {
+                    const baseUrl = {
+                        "Google": "https://www.google.com/search?q=",
+                        "Yandex": "https://yandex.ru/search/?text=",
+                        "Bing": "https://www.bing.com/search?q=",
+                        "DuckDuckGo": "https://duckduckgo.com/?q=",
+                        "Mail.ru": "https://go.mail.ru/search?q=",
+                        "YouTube": "https://www.youtube.com/results?search_query=",
+                        "Wikipedia": "https://ru.wikipedia.org/w/index.php?search="
+                    }[SEARCH_ENGINE] || "https://www.google.com/search?q=";
+                    window.location.href = baseUrl + encodeURIComponent(query);
+                }
+            }
+        });
+
+        // --- Модальное окно ---
+        function openModal() {
+            modal.classList.add('active');
+            input1.value = '';
+            input2.value = '';
+            input1.focus();
+        }
+        function closeModal() {
+            modal.classList.remove('active');
+        }
+        addBtn.addEventListener('click', openModal);
+        cancelBtn.addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+
+        // --- Сохранение ярлыка через мост ---
+        function saveBookmark() {
+            const name = input1.value.trim();
+            const url = input2.value.trim();
+            if (!name || !url) {
+                alert('Заполните оба поля');
+                return;
+            }
+            if (bridge && bridgeReady) {
+                bridge.addBookmark(name, url);
+                closeModal();
+                loadBookmarks();
+            } else {
+                alert('Мост не подключён, попробуйте позже');
+            }
+        }
+        saveBtn.addEventListener('click', saveBookmark);
+
+        // --- Загрузка ярлыков из Python ---
+        function loadBookmarks() {
+            if (!bridge || !bridgeReady) {
+                console.log('Bridge not ready yet');
+                return;
+            }
+            bridge.getBookmarks(function(bookmarksJson) {
+                try {
+                    const bookmarks = JSON.parse(bookmarksJson);
+                    container.innerHTML = '';
+                    bookmarks.forEach((bm) => {
+                        const item = document.createElement('div');
+                        item.className = 'bookmark-item';
+                        item.innerHTML = '🔖 ' + (bm.name || 'Без имени');
+                        item.setAttribute('data-id', bm.id);
+                        item.addEventListener('click', () => {
+                            if (bm.url) window.location.href = bm.url;
+                        });
+                        item.addEventListener('contextmenu', (e) => {
+                            e.preventDefault();
+                            const id = item.getAttribute('data-id');
+                            if (bridge && id) {
+                                bridge.deleteBookmark(parseInt(id));
+                                loadBookmarks();
+                            }
+                        });
+                        container.appendChild(item);
+                    });
+                } catch (e) {
+                    console.error('Error parsing bookmarks:', e);
+                }
+            });
+        }
+    </script>
+</body>
+</html>

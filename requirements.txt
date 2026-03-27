@@ -1,0 +1,15 @@
+PySide6
+
+edge‑tts
+
+pydub
+
+deep‑translator
+
+langdetect
+
+adblock
+
+requests
+
+psutil
