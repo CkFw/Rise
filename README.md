@@ -29,4 +29,4 @@
    cd Rise
 
 Support me/поддержать меня:
-T-Bank - 2200 7008 5419 7323
+[DonationAlets](https://www.donationalerts.com/r/risebrowser)
